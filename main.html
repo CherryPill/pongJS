@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+        <meta charset="utf-8"/>
+        <title>
+                Ping pong
+        </title>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body onload="initGameLoop()">
+		<div id="scoreboard">
+			<h3>scoreboard</h3>
+			<hr>
+			<div id="scores">
+			<div>
+				BOT:
+				<span id="botScore">0</span>
+			</div>
+			<div>
+				YOU:
+				<span id="playerScore">0</span>
+			</div>
+			
+			</div>
+		</div>
+		<div id="field">
+			<div class="racket" id="bot">
+				BOT
+			</div>
+			<div class="ball" id="ball"></div>
+			<div class="racket" id="player">
+				YOU
+			</div>
+		</div>
+</body>
+<script src="pong.js"></script>
+</html>

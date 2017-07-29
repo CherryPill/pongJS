@@ -1,0 +1,50 @@
+body{
+	background-color: #fff;
+}
+div.racket{
+	border-radius:10px;
+	background-color: #000;
+	color:  #fff;
+	border: 1px solid #fff;
+	width: 126px;
+	height: 26px;
+	position: relative;
+	left: 32px;
+	top: 50px;
+	padding: 10px;
+	font-family: Arial;
+	font-size: 1.3em;
+	font-weight: bold;
+	text-align: center;
+}
+div.ball{
+	background-color: #000;
+	border: 1px solid black;
+	width: 24px;
+	height: 24px;
+	position: relative;
+	left: 32px;
+	top: 200px;
+	border-radius: 15px;
+}
+div#player{
+	top: 350px;
+}
+div#field{
+	border-radius: 10px;
+	border: 1px solid #000;
+	margin: auto;
+	width: 700px;
+	height: 500px;
+}
+div#scoreboard{
+	border: 1px solid black;
+	border-radius: 10px;
+	float: left;
+	width: 360px;
+	height: 200px;
+	text-align: center;
+}
+div#scores{
+	font-size: 3.5em;
+}
