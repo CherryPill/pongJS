@@ -41,7 +41,8 @@ var collision = {
 var playerInstance = {
 	w: 126,
 	h: 26,
-	x: 10,
+	defaultPosX: playingField.w/2 - 126/2,
+	x: playingField.w/2 - 126/2,
 	y: 350,
 	time: 0,
 	distanceTraveled: 0,
@@ -54,13 +55,11 @@ var playerInstance = {
 		if(!detectCollisionPanelField(newPos)){
 			playerInstance.e.style.left = newPos + "px";
 			playerInstance.x+=delta;
-			playerInstance.distanceTraveled+=delta;
-			playerInstance.currSpeed = playerInstance.distanceTraveled/playerInstance.time;
 		}
 	},
 	reset: function(){
 		this.directionX = 1;
-		this.x = 10;
+		this.x = this.defaultPosX;
 		this.e.style.left = this.x + "px";
 	}
 };
@@ -68,7 +67,8 @@ var playerInstance = {
 var botInstance = {
 	w: 126,
 	h: 26,
-	x: 10,
+	defaultPosX: playingField.w/2 - 126/2,
+	x: playingField.w/2 - 126/2,
 	y: 50,
 	direction: 1,
 	halted: false,
@@ -99,7 +99,7 @@ var botInstance = {
 	},
 	reset: function(){
 		this.direction = 1;
-		this.x = 10;
+		this.x = this.defaultPosX;
 		this.e.style.left = this.x + "px";
 	}
 };
@@ -111,6 +111,13 @@ function resetPlayingField(){
 function updateScoresUI(){
 	scores.update();
 	resetPlayingField();
+}
+function getRandomDir(){
+	var arr = [-1, 1];
+	return Math.ceil(Math.random() * arr.length - 1)
+}
+function getRandomNum(upto){
+	return Math.ceil(Math.random() * upto);
 }
 //directionY: 1 = down, -1 = up
 //directionX: 1 = right, -1 = left
@@ -131,13 +138,17 @@ var ballInstance = {
 		this.x += (Math.acos(delta) * this.directionX) * this.speed;
 	},
 	reset: function(){
-		this.directionX = 1;
-		this.x = 10;
+		this.angle = getRandomNum(80);
+		this.directionX = getRandomDir();
+		this.x = getRandomNum(playingField.w/2);
 		this.y = 100;
 		this.speed = this.initSpeed;
 		this.e.style.left = this.x + "px";
 		this.e.style.top = this.y + "px";
 	}
+}
+function movePlayer(){
+	playerInstance.e.style.left = playerInstance.x + "px";
 }
 function initGameLoop(){
 	document.addEventListener("keydown", movePlayerRacket, false);
@@ -145,6 +156,7 @@ function initGameLoop(){
 	ballInstance.e.style.left = 10 + "px";
 	moveBot(1);
 	moveBall();
+	movePlayer();
 }
 function reverseBallDir(){
 	if(ballInstance.directionY == 1){ //player
@@ -263,15 +275,12 @@ function detectCollisionPanelFieldBot(newPos){
 function movePlayerRacket(e){
 	var key = e.keyCode;
 	if(key == 37 || key == 39){
-		setInterval(function () {
-		playerInstance.time+=1;
-		}, 1000);
-	if(key == controlKey.LEFT){
-		playerInstance.move(-1);
-	}
-	else if(key == controlKey.RIGHT){
-		playerInstance.move(1);
-	}	
+		if(key == controlKey.LEFT){
+			playerInstance.move(-1);
+		}
+		else if(key == controlKey.RIGHT){
+			playerInstance.move(1);
+		}	
 	}
 }
 function moveBot(dir){

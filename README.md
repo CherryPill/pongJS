@@ -6,4 +6,4 @@ How to install:
 
 - Download ZIP
 - Unzip into any folder
-- Open main.html
+- Open main.html with a browser of your choice
