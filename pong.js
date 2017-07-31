@@ -137,12 +137,12 @@ var ballInstance = {
 	directionX: 1,
 	e: document.getElementById("ball"),
 	move: function(){
-		var el = document.getElementById("debug");
+		//var el = document.getElementById("debug");
 		var delta = Math.sin(this.angle*Math.PI/180);
 		this.y += delta * this.speed * this.directionY;
 		this.x += (Math.acos(delta) * this.directionX) * this.speed;
-		el.innerHTML = "delta: "+delta+", angle: "+this.angle+", speed: "+this.speed +
-		"y: "+this.y+"x: "+this.x+", direction:X:"+this.directionX;
+		/*el.innerHTML = "delta: "+delta+", angle: "+this.angle+", speed: "+this.speed +
+		"y: "+this.y+"x: "+this.x+", direction:X:"+this.directionX;*/
 	},
 	reset: function(){
 		this.angle = getRandomNum(30, 80);
