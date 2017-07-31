@@ -1,7 +1,6 @@
 Simple arcade ping pong game written in pure JS. Nothing fancy.
 
-<img src="http://i.imgur.com/xLZuweE.gif"/>
-
+<img src="http://i.imgur.com/ah9augK.gif"/>
 How to install:
 
 - Download ZIP
