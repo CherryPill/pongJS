@@ -1,6 +1,11 @@
 body{
 	background-color: #fff;
 }
+.container{
+	border-radius: 10px;
+	border: 1px solid #000;
+	background-color: #fff;
+}
 div.racket{
 	border-radius:10px;
 	background-color: #000;
@@ -31,15 +36,12 @@ div#player{
 	top: 350px;
 }
 div#field{
-	border-radius: 10px;
-	border: 1px solid #000;
 	margin: auto;
 	width: 700px;
 	height: 500px;
+	margin-bottom: 50px;
 }
 div#scoreboard{
-	border: 1px solid black;
-	border-radius: 10px;
 	float: left;
 	width: 360px;
 	height: 200px;
@@ -47,4 +49,17 @@ div#scoreboard{
 }
 div#scores{
 	font-size: 3.5em;
+}
+div#howto{
+	margin: auto;
+	text-align: center;
+	width: 685px;
+	height: 30px;
+	padding: 10px;
+}
+kbd{
+	border: 1px solid #000;
+	font-weight: bold;
+	padding: 5px;
+	margin-left: 5px;
 }

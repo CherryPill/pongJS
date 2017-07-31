@@ -114,10 +114,14 @@ function updateScoresUI(){
 }
 function getRandomDir(){
 	var arr = [-1, 1];
-	return Math.ceil(Math.random() * arr.length - 1)
+	return arr[Math.ceil(Math.random() * arr.length - 1)];
 }
-function getRandomNum(upto){
-	return Math.ceil(Math.random() * upto);
+function getRandomNum(fr, upto){
+	var rNum = Math.ceil(Math.random() * upto);
+	return rNum < fr ? 
+			rNum += fr 
+			: 
+			rNum;
 }
 //directionY: 1 = down, -1 = up
 //directionX: 1 = right, -1 = left
@@ -133,14 +137,18 @@ var ballInstance = {
 	directionX: 1,
 	e: document.getElementById("ball"),
 	move: function(){
+		var el = document.getElementById("debug");
 		var delta = Math.sin(this.angle*Math.PI/180);
 		this.y += delta * this.speed * this.directionY;
 		this.x += (Math.acos(delta) * this.directionX) * this.speed;
+		el.innerHTML = "delta: "+delta+", angle: "+this.angle+", speed: "+this.speed +
+		"y: "+this.y+"x: "+this.x+", direction:X:"+this.directionX;
 	},
 	reset: function(){
-		this.angle = getRandomNum(80);
+		this.angle = getRandomNum(30, 80);
 		this.directionX = getRandomDir();
-		this.x = getRandomNum(playingField.w/2);
+		this.directionY = 1;
+		this.x = getRandomNum(0, playingField.w);
 		this.y = 100;
 		this.speed = this.initSpeed;
 		this.e.style.left = this.x + "px";
@@ -184,12 +192,19 @@ function detectCollision(){
 	//get bottom coord
 	var currBottomY = ballInstance.y;
 	var currX = ballInstance.x;
-	if(currBottomY >= 350 && 
+	if(currBottomY >= 420){
+		scores.bot+=1;
+		updateScoresUI();
+	}
+	else if(currBottomY <= 0){
+		scores.player+=1;
+		updateScoresUI();
+	}
+	else if((currBottomY >= 350) && 
 		(ballInstance.x > playerInstance.x 
 			&& 
 		ballInstance.x < playerInstance.x + playerInstance.w)) {
 		if(playerInstance.directionX != 0){
-			
 			if(playerInstance.directionX != ballInstance.directionX){
 				ballInstance.speed+=1;
 				reverseBallDir();
@@ -198,7 +213,6 @@ function detectCollision(){
 				//hmmm
 			}
 		}
-		
 		return collision.withPlayer;
 	}
 	else if((currBottomY <= botInstance.y) &&
@@ -215,14 +229,6 @@ function detectCollision(){
 	else if(currX <= playingField.leftX) {
 		//alert("west wall collision");
 		return collision.withWestWall;
-	}
-	else if(currBottomY >= playingField.h){
-		scores.bot+=1;
-		updateScoresUI();
-	}
-	else if(currBottomY <= 0){
-		scores.player+=1;
-		updateScoresUI();
 	}
 }
 function moveBall(){
