@@ -9,6 +9,11 @@ var scores = {
 	}
 };
 
+var soundEffects = {
+	ballHitRacket: new Audio("assets/audio/env/ball/ball_hit_racket.mp3"),
+	playerLost: new Audio("assets/audio/env/game/round_lost.mp3"),
+	playerWon: new Audio("assets/audio/env/game/round_won.mp3"),
+};
 var controlKey ={
 	LEFT: 37,
 	RIGHT: 39
@@ -194,10 +199,12 @@ function detectCollision(){
 	var currX = ballInstance.x;
 	if(currBottomY >= 420){
 		scores.bot+=1;
+		soundEffects.playerLost.play();
 		updateScoresUI();
 	}
 	else if(currBottomY <= 0){
 		scores.player+=1;
+		soundEffects.playerWon.play();
 		updateScoresUI();
 	}
 	else if((currBottomY >= 350) && 
@@ -236,9 +243,11 @@ function moveBall(){
 	ballInstance.e.style.top = ballInstance.y + "px";
 	ballInstance.e.style.left = ballInstance.x + "px";
 	if(detectCollision() == collision.withPlayer){
+		soundEffects.ballHitRacket.play();
 		ballInstance.directionY = -1;
 	}
 	else if(detectCollision() == collision.withBot){
+		soundEffects.ballHitRacket.play();
 		ballInstance.directionY = 1;
 	}
 	else if(detectCollision() == collision.withWestWall){
