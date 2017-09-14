@@ -1,3 +1,18 @@
+var colors = {
+    availableColors:['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
+		  '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
+		  '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A',
+		  '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+		  '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC',
+		  '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
+		  '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680',
+		  '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
+		  '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3',
+		  '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'],
+		getRandom: function() {
+				return this.availableColors[Math.ceil(Math.random() * this.availableColors.length)];
+		}
+};
 var scores = {
 	player: 0,
 	bot: 0,
@@ -66,7 +81,11 @@ var playerInstance = {
 		this.directionX = 1;
 		this.x = this.defaultPosX;
 		this.e.style.left = this.x + "px";
-	}
+	},
+  changeColor: function(){
+      this.e.style.backgroundColor = colors.getRandom();
+      ballInstance.e.style.backgroundColor = colors.getRandom();
+  }
 };
 //y is contant
 var botInstance = {
@@ -100,13 +119,17 @@ var botInstance = {
 			}
 			if(!this.halted) {
 				botInstance.x+=delta;
-			}	
+			}
 	},
 	reset: function(){
 		this.direction = 1;
 		this.x = this.defaultPosX;
 		this.e.style.left = this.x + "px";
-	}
+	},
+  changeColor: function(){
+      this.e.style.backgroundColor = colors.getRandom();
+      ballInstance.e.style.backgroundColor = colors.getRandom();
+  }
 };
 function resetPlayingField(){
 	ballInstance.reset();
@@ -123,9 +146,9 @@ function getRandomDir(){
 }
 function getRandomNum(fr, upto){
 	var rNum = Math.ceil(Math.random() * upto);
-	return rNum < fr ? 
-			rNum += fr 
-			: 
+	return rNum < fr ?
+			rNum += fr
+			:
 			rNum;
 }
 //directionY: 1 = down, -1 = up
@@ -158,7 +181,10 @@ var ballInstance = {
 		this.speed = this.initSpeed;
 		this.e.style.left = this.x + "px";
 		this.e.style.top = this.y + "px";
-	}
+	},
+  changeColor: function(){
+      this.e.style.backgroundColor = colors.getRandom();
+  }
 }
 function movePlayer(){
 	playerInstance.e.style.left = playerInstance.x + "px";
@@ -207,9 +233,9 @@ function detectCollision(){
 		soundEffects.playerWon.play();
 		updateScoresUI();
 	}
-	else if((currBottomY >= 350) && 
-		(ballInstance.x > playerInstance.x 
-			&& 
+	else if((currBottomY >= 350) &&
+		(ballInstance.x > playerInstance.x
+			&&
 		ballInstance.x < playerInstance.x + playerInstance.w)) {
 		if(playerInstance.directionX != 0){
 			if(playerInstance.directionX != ballInstance.directionX){
@@ -223,8 +249,8 @@ function detectCollision(){
 		return collision.withPlayer;
 	}
 	else if((currBottomY <= botInstance.y) &&
-		(ballInstance.x > botInstance.x 
-			&& 
+		(ballInstance.x > botInstance.x
+			&&
 		ballInstance.x < botInstance.x + botInstance.w)) {
 			//alert("collision with bot")
 		return collision.withBot;
@@ -243,10 +269,12 @@ function moveBall(){
 	ballInstance.e.style.top = ballInstance.y + "px";
 	ballInstance.e.style.left = ballInstance.x + "px";
 	if(detectCollision() == collision.withPlayer){
+    playerInstance.changeColor();
 		soundEffects.ballHitRacket.play();
 		ballInstance.directionY = -1;
 	}
 	else if(detectCollision() == collision.withBot){
+    botInstance.changeColor();
 		soundEffects.ballHitRacket.play();
 		ballInstance.directionY = 1;
 	}
@@ -256,7 +284,7 @@ function moveBall(){
 			ballInstance.directionX = 1;
 		}
 		else if (ballInstance.directionY == 1 && ballInstance.directionX == -1){
-			ballInstance.directionX = 1;	
+			ballInstance.directionX = 1;
 		}
 	}
 	else if(detectCollision() == collision.withEastWall){
@@ -265,7 +293,7 @@ function moveBall(){
 			ballInstance.directionX = -1;
 		}
 		else if (ballInstance.directionY == 1 && ballInstance.directionX == 1){
-			ballInstance.directionX = -1;	
+			ballInstance.directionX = -1;
 		}
 	}
 	var t = setTimeout(function(){moveBall()},25);
@@ -295,7 +323,7 @@ function movePlayerRacket(e){
 		}
 		else if(key == controlKey.RIGHT){
 			playerInstance.move(1);
-		}	
+		}
 	}
 }
 function moveBot(dir){
