@@ -1,3 +1,44 @@
+var directionVars = {
+  DIR_X_LEFT: -1,
+  DIR_X_RIGHT: 1,
+  DIR_Y_UP: -1,
+  DIR_Y_DWN: 1
+};
+var gameState = {
+    paused: false,
+    overLay: document.getElementById("overlay"),
+    pausedMessage: document.getElementById("paused"),
+    toggleFreezeGame: function(){
+        this.paused = !this.paused;
+        this.pausedMessage.style.visibility = this.paused?"visible":"hidden";
+    },
+    setUpPosition: function(){
+        this.overLay.style.zIndex = 1;
+        this.pausedMessage.style.left = playingField.viewPortWidth/2 - 100+"px";
+        this.pausedMessage.style.top = playingField.viewPortHeight/2 - 80+"px";
+    },
+    hideOverlay: function(){
+      this.overLay.style.visibility = "hidden";
+    }
+};
+var mainMenu = {
+  menuWindow: document.getElementById("menu"),
+  startSingle: document.getElementById("sp"),
+  startMulti: document.getElementById("mp"),
+  showWindow: function(){
+    this.menuWindow.style.zIndex = 2;
+        this.menuWindow.style.top = playingField.viewPortHeight/2 - 80+"px";
+    this.startSingle.addEventListener("click", function(){
+      commenceGame(0);
+    });
+    this.startMulti.addEventListener("click", function(){
+      commenceGame(1);
+    })
+  },
+  hideWindow: function(){
+    this.menuWindow.style.visibility = "hidden";
+  }
+};
 var colors = {
     availableColors:['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
 		  '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
@@ -29,13 +70,17 @@ var soundEffects = {
 	playerLost: new Audio("assets/audio/env/game/round_lost.mp3"),
 	playerWon: new Audio("assets/audio/env/game/round_won.mp3"),
 };
+
 var controlKey ={
 	LEFT: 37,
-	RIGHT: 39
+	RIGHT: 39,
+  ESC: 27
 };
 
 var playingField = {
-	leftX:0,
+  viewPortWidth: 0,
+  viewPortHeight: 0,
+	leftX: 0,
 	rightX: 0,
 	topY: 0,
 	w: 700,
@@ -48,6 +93,7 @@ var botCollisionWithBorder = {
 	borderLeft: 1,
 	noCollision: 2
 };
+
 var collision = {
 	withBot: 0,
 	withPlayer: 1,
@@ -191,27 +237,38 @@ function movePlayer(){
 }
 function initGameLoop(){
 	document.addEventListener("keydown", movePlayerRacket, false);
+  playingField.viewPortWidth = document.documentElement.clientWidth;
+  playingField.viewPortHeight = document.documentElement.clientHeight;
+  gameState.setUpPosition();
+  mainMenu.showWindow();
 	ballInstance.e.style.top = 100 + "px";
 	ballInstance.e.style.left = 10 + "px";
-	moveBot(1);
-	moveBall();
-	movePlayer();
+
+}
+function commenceGame(gameMode){
+  mainMenu.hideWindow();
+  gameState.hideOverlay();
+    if(!gameMode){
+      	moveBot(1);
+      	moveBall();
+      	movePlayer();
+    }
 }
 function reverseBallDir(){
 	if(ballInstance.directionY == 1){ //player
 		if(ballInstance.directionX == 1){
-			ballInstance.directionY = -1;
-			ballInstance.directionX = -1;
+			ballInstance.directionY = directionVars.DIR_Y_UP;
+			ballInstance.directionX = directionVars.DIR_X_LEFT;
 		}
 		else{
-			ballInstance.directionY = -1;
-			ballInstance.directionX = 1;
+			ballInstance.directionY = directionVars.DIR_Y_UP;
+			ballInstance.directionX = directionVars.DIR_X_RIGHT;
 		}
 	}
 	else{ //bot
 		if(ballInstance.directionX == 1){
-			ballInstance.directionY = 1;
-			ballInstance.directionX = -1;
+			ballInstance.directionY = directionVars.DIR_Y_DWN;
+			ballInstance.directionX = directionVars.DIR_X_LEFT;
 		}
 		else{
 			ballInstance.directionY = 1;
@@ -243,7 +300,7 @@ function detectCollision(){
 				reverseBallDir();
 			}
 			else{
-				//hmmm
+				ballInstance.speed+=.25;
 			}
 		}
 		return collision.withPlayer;
@@ -265,37 +322,39 @@ function detectCollision(){
 	}
 }
 function moveBall(){
-	ballInstance.move();
-	ballInstance.e.style.top = ballInstance.y + "px";
-	ballInstance.e.style.left = ballInstance.x + "px";
-	if(detectCollision() == collision.withPlayer){
-    playerInstance.changeColor();
-		soundEffects.ballHitRacket.play();
-		ballInstance.directionY = -1;
-	}
-	else if(detectCollision() == collision.withBot){
-    botInstance.changeColor();
-		soundEffects.ballHitRacket.play();
-		ballInstance.directionY = 1;
-	}
-	else if(detectCollision() == collision.withWestWall){
-		if(ballInstance.directionY == -1 && ballInstance.directionX == -1){
-			ballInstance.directionY = -1;
-			ballInstance.directionX = 1;
-		}
-		else if (ballInstance.directionY == 1 && ballInstance.directionX == -1){
-			ballInstance.directionX = 1;
-		}
-	}
-	else if(detectCollision() == collision.withEastWall){
-		if(ballInstance.directionY == -1 && ballInstance.directionX == 1){
-			ballInstance.directionY = -1;
-			ballInstance.directionX = -1;
-		}
-		else if (ballInstance.directionY == 1 && ballInstance.directionX == 1){
-			ballInstance.directionX = -1;
-		}
-	}
+  if(!gameState.paused){
+    ballInstance.move();
+  	ballInstance.e.style.top = ballInstance.y + "px";
+  	ballInstance.e.style.left = ballInstance.x + "px";
+  	if(detectCollision() == collision.withPlayer){
+      playerInstance.changeColor();
+  		soundEffects.ballHitRacket.play();
+  		ballInstance.directionY = -1;
+  	}
+  	else if(detectCollision() == collision.withBot){
+      botInstance.changeColor();
+  		soundEffects.ballHitRacket.play();
+  		ballInstance.directionY = 1;
+  	}
+  	else if(detectCollision() == collision.withWestWall){
+  		if(ballInstance.directionY == -1 && ballInstance.directionX == -1){
+  			ballInstance.directionY = -1;
+  			ballInstance.directionX = 1;
+  		}
+  		else if (ballInstance.directionY == 1 && ballInstance.directionX == -1){
+  			ballInstance.directionX = 1;
+  		}
+  	}
+  	else if(detectCollision() == collision.withEastWall){
+  		if(ballInstance.directionY == -1 && ballInstance.directionX == 1){
+  			ballInstance.directionY = -1;
+  			ballInstance.directionX = -1;
+  		}
+  		else if (ballInstance.directionY == 1 && ballInstance.directionX == 1){
+  			ballInstance.directionX = -1;
+  		}
+  	}
+  }
 	var t = setTimeout(function(){moveBall()},25);
 }
 function detectCollisionPanelField(newPos){
@@ -317,17 +376,24 @@ function detectCollisionPanelFieldBot(newPos){
 }
 function movePlayerRacket(e){
 	var key = e.keyCode;
-	if(key == 37 || key == 39){
-		if(key == controlKey.LEFT){
-			playerInstance.move(-1);
-		}
-		else if(key == controlKey.RIGHT){
-			playerInstance.move(1);
-		}
+	if(key == controlKey.LEFT || key == controlKey.RIGHT){
+    if(!gameState.paused){
+      if(key == controlKey.LEFT){
+        playerInstance.move(directionVars.DIR_X_LEFT);
+      }
+      else if(key == controlKey.RIGHT){
+        playerInstance.move(directionVars.DIR_X_RIGHT);
+      }
+    }
 	}
+  else if(key == controlKey.ESC){
+      gameState.toggleFreezeGame();
+  }
 }
 function moveBot(dir){
-	botInstance.move();
-	botInstance.e.style.left = botInstance.x + "px";
+  if(!gameState.paused){
+    botInstance.move();
+    botInstance.e.style.left = botInstance.x + "px";
+  }
 	var t = setTimeout(function(){moveBot(dir)},50);
 }
