@@ -4,7 +4,12 @@ var directionVars = {
   DIR_Y_UP: -1,
   DIR_Y_DWN: 1
 };
+var gameModes = {
+      SINGLE_PLAYER: 0,
+      MULTI_PLAYER: 1
+}
 var gameState = {
+    gameMode: gameModes.SINGLE_PLAYER,
     paused: false,
     overLay: document.getElementById("overlay"),
     pausedMessage: document.getElementById("paused"),
@@ -74,7 +79,9 @@ var soundEffects = {
 var controlKey ={
 	LEFT: 37,
 	RIGHT: 39,
-  ESC: 27
+      ESC: 27,
+      WASD_A: 65,
+      WASD_D: 68
 };
 
 var playingField = {
@@ -111,7 +118,6 @@ var playerInstance = {
 	x: playingField.w/2 - 126/2,
 	y: 350,
 	time: 0,
-	distanceTraveled: 0,
 	directionX: 0,
 	e: document.getElementById("player"),
 	move: function(dir){
@@ -248,11 +254,17 @@ function initGameLoop(){
 function commenceGame(gameMode){
   mainMenu.hideWindow();
   gameState.hideOverlay();
+  //start single player game and initialize bot
     if(!gameMode){
       	moveBot(1);
       	moveBall();
       	movePlayer();
     }
+   //start local multiplayer game
+    else{
+          moveBall();
+          movePlayer();
+   }
 }
 function reverseBallDir(){
 	if(ballInstance.directionY == 1){ //player
@@ -376,15 +388,26 @@ function detectCollisionPanelFieldBot(newPos){
 }
 function movePlayerRacket(e){
 	var key = e.keyCode;
-	if(key == controlKey.LEFT || key == controlKey.RIGHT){
-    if(!gameState.paused){
-      if(key == controlKey.LEFT){
-        playerInstance.move(directionVars.DIR_X_LEFT);
-      }
-      else if(key == controlKey.RIGHT){
-        playerInstance.move(directionVars.DIR_X_RIGHT);
-      }
-    }
+	if(key == controlKey.LEFT || key == controlKey.RIGHT
+            || key == controlKey.WASD_A || key == controlKey.WASD_D){
+          if(!gameState.paused){
+                if(gameState.gameMode == gameModes.MULTI_PLAYER){
+                      if(key == controlKey.LEFT){
+                        playerInstance_1.move(directionVars.DIR_X_LEFT);
+                      }
+                      else if(key == controlKey.RIGHT){
+                        playerInstance_1.move(directionVars.DIR_X_RIGHT);
+                  }
+            }
+            if(key == controlKey.LEFT){
+              playerInstance.move(directionVars.DIR_X_LEFT);
+            }
+            else if(key == controlKey.RIGHT){
+              playerInstance.move(directionVars.DIR_X_RIGHT);
+            }
+
+          }
+
 	}
   else if(key == controlKey.ESC){
       gameState.toggleFreezeGame();
