@@ -1,3 +1,7 @@
+var paths = {
+      soundsBasePath: "assets/audio/",
+      iconsBasePath: "assets/icons/"
+};
 var directionVars = {
   DIR_X_LEFT: -1,
   DIR_X_RIGHT: 1,
@@ -7,10 +11,12 @@ var directionVars = {
 var gameModes = {
       SINGLE_PLAYER: 0,
       MULTI_PLAYER: 1
-}
+};
 var gameState = {
     gameMode: gameModes.SINGLE_PLAYER,
     paused: false,
+    soundEnabled: true,
+    soundPanel: document.getElementById("sound"),
     overLay: document.getElementById("overlay"),
     pausedMessage: document.getElementById("paused"),
     toggleFreezeGame: function(){
@@ -24,7 +30,16 @@ var gameState = {
     },
     hideOverlay: function(){
       this.overLay.style.visibility = "hidden";
-    }
+    },
+    toggleSound: function(){
+          this.soundEnabled = !this.soundEnabled;
+          if(this.soundEnabled){
+               this.soundPanel.src = paths.iconsBasePath+"sound_on.png";
+          }
+          else{
+                this.soundPanel.src = paths.iconsBasePath+"sound_off.png";
+          }
+   }
 };
 var mainMenu = {
   menuWindow: document.getElementById("menu"),
@@ -34,10 +49,10 @@ var mainMenu = {
     this.menuWindow.style.zIndex = 2;
         this.menuWindow.style.top = playingField.viewPortHeight/2 - 80+"px";
     this.startSingle.addEventListener("click", function(){
-      commenceGame(0);
+      commenceGame(gameModes.SINGLE_PLAYER);
     });
     this.startMulti.addEventListener("click", function(){
-      commenceGame(1);
+      commenceGame(gameModes.MULTI_PLAYER);
     })
   },
   hideWindow: function(){
@@ -71,9 +86,15 @@ var scores = {
 };
 
 var soundEffects = {
-	ballHitRacket: new Audio("assets/audio/env/ball/ball_hit_racket.mp3"),
-	playerLost: new Audio("assets/audio/env/game/round_lost.mp3"),
-	playerWon: new Audio("assets/audio/env/game/round_won.mp3"),
+      soundTypes: {
+            BALL_HIT_RACKET: 0, ROUND_LOST: 1, ROUND_WON: 2
+      },
+      availableSounds: ["ball_hit_racket.mp3", "round_lost.mp3", "round_won.mp3"],
+      playSound: function(soundType){
+            if(gameState.soundEnabled){
+                  new Audio(paths.soundsBasePath+this.availableSounds[soundType]).play();
+            }
+      }
 };
 
 var controlKey ={
@@ -83,7 +104,13 @@ var controlKey ={
       WASD_A: 65,
       WASD_D: 68
 };
-
+var controlKeys = {
+      LEFT_PRESSED: false,
+      RIGHT_PRESSED: false,
+      ESC_PRESSED: false,
+      WASD_A_PRESSED: false,
+      WASD_D_PRESSED: false
+};
 var playingField = {
   viewPortWidth: 0,
   viewPortHeight: 0,
@@ -141,6 +168,7 @@ var playerInstance = {
 };
 //y is contant
 var botInstance = {
+      controlledByHuman: false,
 	w: 126,
 	h: 26,
 	defaultPosX: playingField.w/2 - 126/2,
@@ -149,7 +177,16 @@ var botInstance = {
 	direction: 1,
 	halted: false,
 	e: document.getElementById("bot"),
-	move: function(){
+      moveByPlayer: function(dir){
+		this.directionX = dir;
+		var delta = (10 * dir);
+		var newPos = botInstance.x + delta;
+		if(!detectCollisionPanelField(newPos)){
+			botInstance.e.style.left = newPos + "px";
+			botInstance.x+=delta;
+		}
+	},
+	move: function(){ //bot logic
 		this.halted = false;
 		var ballPositionY = ballInstance.y;
 		var ballPositionX = ballInstance.x;
@@ -238,20 +275,24 @@ var ballInstance = {
       this.e.style.backgroundColor = colors.getRandom();
   }
 }
+//mode
 function movePlayer(){
 	playerInstance.e.style.left = playerInstance.x + "px";
+      if(gameState.gameMode == gameModes.MULTI_PLAYER){
+            botInstance.e.style.left = botInstance.x + "px";
+      }
 }
 function initGameLoop(){
-	document.addEventListener("keydown", movePlayerRacket, false);
+  document.addEventListener("keydown", movePlayerRacket, false);
   playingField.viewPortWidth = document.documentElement.clientWidth;
   playingField.viewPortHeight = document.documentElement.clientHeight;
   gameState.setUpPosition();
   mainMenu.showWindow();
-	ballInstance.e.style.top = 100 + "px";
-	ballInstance.e.style.left = 10 + "px";
-
+  ballInstance.e.style.top = 100 + "px";
+  ballInstance.e.style.left = 10 + "px";
 }
 function commenceGame(gameMode){
+  gameState.gameMode = gameMode;
   mainMenu.hideWindow();
   gameState.hideOverlay();
   //start single player game and initialize bot
@@ -294,12 +335,12 @@ function detectCollision(){
 	var currX = ballInstance.x;
 	if(currBottomY >= 420){
 		scores.bot+=1;
-		soundEffects.playerLost.play();
+		soundEffects.playSound(soundEffects.soundTypes.ROUND_LOST);
 		updateScoresUI();
 	}
 	else if(currBottomY <= 0){
 		scores.player+=1;
-		soundEffects.playerWon.play();
+		soundEffects.playSound(soundEffects.soundTypes.ROUND_WON);
 		updateScoresUI();
 	}
 	else if((currBottomY >= 350) &&
@@ -340,13 +381,13 @@ function moveBall(){
   	ballInstance.e.style.left = ballInstance.x + "px";
   	if(detectCollision() == collision.withPlayer){
       playerInstance.changeColor();
-  		soundEffects.ballHitRacket.play();
+		soundEffects.playSound(soundEffects.soundTypes.BALL_HIT_RACKET);
   		ballInstance.directionY = -1;
   	}
   	else if(detectCollision() == collision.withBot){
-      botInstance.changeColor();
-  		soundEffects.ballHitRacket.play();
-  		ballInstance.directionY = 1;
+            botInstance.changeColor();
+            soundEffects.playSound(soundEffects.soundTypes.BALL_HIT_RACKET);
+            ballInstance.directionY = 1;
   	}
   	else if(detectCollision() == collision.withWestWall){
   		if(ballInstance.directionY == -1 && ballInstance.directionX == -1){
@@ -387,16 +428,19 @@ function detectCollisionPanelFieldBot(newPos){
 	}
 }
 function movePlayerRacket(e){
+      e.preventDefault();
 	var key = e.keyCode;
-	if(key == controlKey.LEFT || key == controlKey.RIGHT
-            || key == controlKey.WASD_A || key == controlKey.WASD_D){
+	if(key == controlKey.LEFT ||
+            key == controlKey.RIGHT
+            || key == controlKey.WASD_A
+            || key == controlKey.WASD_D){
           if(!gameState.paused){
                 if(gameState.gameMode == gameModes.MULTI_PLAYER){
-                      if(key == controlKey.LEFT){
-                        playerInstance_1.move(directionVars.DIR_X_LEFT);
+                      if(key == controlKey.WASD_A){
+                        botInstance.moveByPlayer(directionVars.DIR_X_LEFT);
                       }
-                      else if(key == controlKey.RIGHT){
-                        playerInstance_1.move(directionVars.DIR_X_RIGHT);
+                      else if(key == controlKey.WASD_D){
+                        botInstance.moveByPlayer(directionVars.DIR_X_RIGHT);
                   }
             }
             if(key == controlKey.LEFT){
@@ -413,10 +457,14 @@ function movePlayerRacket(e){
       gameState.toggleFreezeGame();
   }
 }
+
 function moveBot(dir){
   if(!gameState.paused){
     botInstance.move();
     botInstance.e.style.left = botInstance.x + "px";
   }
 	var t = setTimeout(function(){moveBot(dir)},50);
+}
+function toggleSound(){
+      gameState.toggleSound();
 }

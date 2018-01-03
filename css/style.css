@@ -22,6 +22,7 @@ div.racket{
 	font-size: 1.3em;
 	font-weight: bold;
 	text-align: center;
+	
 }
 div.ball{
 	background-color: #000;
@@ -84,17 +85,17 @@ div#paused{
 	}
 }
 div#menu{
-
+	  left: 25%;
 	  position: fixed;
-		width: 100%;
-		text-align: center;
-		background-color: #000;
-		color: #fff;
+	  width: 50%;
+	  text-align: center;
+	  background-color: #000;
+	  color: #fff;
 }
 .menuItem{
 		font-size: 2.8em;
 		padding: 10px;
-	  border: 1px solid #000;
+	      border: 1px solid #000;
 		transition: background-color 0.5s ease;
 		background-color: #000;
 }
