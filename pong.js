@@ -8,6 +8,7 @@ var directionVars = {
   DIR_Y_UP: -1,
   DIR_Y_DWN: 1
 };
+
 var gameModes = {
       SINGLE_PLAYER: 0,
       MULTI_PLAYER: 1
@@ -104,10 +105,9 @@ var controlKey ={
       WASD_A: 65,
       WASD_D: 68
 };
-var controlKeys = {
+var pressedKeys = {
       LEFT_PRESSED: false,
       RIGHT_PRESSED: false,
-      ESC_PRESSED: false,
       WASD_A_PRESSED: false,
       WASD_D_PRESSED: false
 };
@@ -275,15 +275,76 @@ var ballInstance = {
       this.e.style.backgroundColor = colors.getRandom();
   }
 }
-//mode
 function movePlayer(){
-	playerInstance.e.style.left = playerInstance.x + "px";
-      if(gameState.gameMode == gameModes.MULTI_PLAYER){
-            botInstance.e.style.left = botInstance.x + "px";
+      if(!gameState.paused){
+            if(pressedKeys.LEFT_PRESSED == true){
+                  playerInstance.move(directionVars.DIR_X_LEFT);
+            }
+            if(pressedKeys.RIGHT_PRESSED == true){
+                  playerInstance.move(directionVars.DIR_X_RIGHT);
+            }
+            if(gameState.gameMode == gameModes.MULTI_PLAYER){
+
+                  if(pressedKeys.WASD_A_PRESSED){
+                        botInstance.moveByPlayer(directionVars.DIR_X_LEFT);
+                  }
+                  if(pressedKeys.WASD_D_PRESSED){
+                        botInstance.moveByPlayer(directionVars.DIR_X_RIGHT);
+                  }
+            }
+      	playerInstance.e.style.left = playerInstance.x + "px";
+            if(gameState.gameMode == gameModes.MULTI_PLAYER){
+                  botInstance.e.style.left = botInstance.x + "px";
+            }
       }
+
+      var t = setTimeout(function(){movePlayer()},50);
 }
 function initGameLoop(){
-  document.addEventListener("keydown", movePlayerRacket, false);
+  document.addEventListener("keydown", function(e){
+        switch(e.keyCode){
+             case controlKey.LEFT:{
+                   pressedKeys.LEFT_PRESSED = true;
+                   break;
+             }
+             case controlKey.RIGHT:{
+                   pressedKeys.RIGHT_PRESSED = true;
+                   break;
+             }
+             case controlKey.WASD_A:{
+                   pressedKeys.WASD_A_PRESSED = true;
+                   break;
+             }
+             case controlKey.WASD_D:{
+                   pressedKeys.WASD_D_PRESSED = true;
+                   break;
+             }
+             case controlKey.ESC:{
+                   gameState.toggleFreezeGame();
+                   break;
+             }
+       }
+ } , false);
+  document.addEventListener("keyup", function(e){
+        switch(e.keyCode){
+             case controlKey.LEFT:{
+                   pressedKeys.LEFT_PRESSED = false;
+                   break;
+             }
+             case controlKey.RIGHT:{
+                   pressedKeys.RIGHT_PRESSED = false;
+                   break;
+             }
+             case controlKey.WASD_A:{
+                   pressedKeys.WASD_A_PRESSED = false;
+                   break;
+             }
+             case controlKey.WASD_D:{
+                   pressedKeys.WASD_D_PRESSED = false;
+                   break;
+             }
+       }
+ }, false);
   playingField.viewPortWidth = document.documentElement.clientWidth;
   playingField.viewPortHeight = document.documentElement.clientHeight;
   gameState.setUpPosition();
@@ -303,8 +364,10 @@ function commenceGame(gameMode){
     }
    //start local multiplayer game
     else{
+
           moveBall();
           movePlayer();
+
    }
 }
 function reverseBallDir(){
@@ -427,36 +490,7 @@ function detectCollisionPanelFieldBot(newPos){
 		return botCollisionWithBorder.noCollision;
 	}
 }
-function movePlayerRacket(e){
-      e.preventDefault();
-	var key = e.keyCode;
-	if(key == controlKey.LEFT ||
-            key == controlKey.RIGHT
-            || key == controlKey.WASD_A
-            || key == controlKey.WASD_D){
-          if(!gameState.paused){
-                if(gameState.gameMode == gameModes.MULTI_PLAYER){
-                      if(key == controlKey.WASD_A){
-                        botInstance.moveByPlayer(directionVars.DIR_X_LEFT);
-                      }
-                      else if(key == controlKey.WASD_D){
-                        botInstance.moveByPlayer(directionVars.DIR_X_RIGHT);
-                  }
-            }
-            if(key == controlKey.LEFT){
-              playerInstance.move(directionVars.DIR_X_LEFT);
-            }
-            else if(key == controlKey.RIGHT){
-              playerInstance.move(directionVars.DIR_X_RIGHT);
-            }
 
-          }
-
-	}
-  else if(key == controlKey.ESC){
-      gameState.toggleFreezeGame();
-  }
-}
 
 function moveBot(dir){
   if(!gameState.paused){
