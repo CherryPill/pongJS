@@ -1,57 +1,57 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-        <meta charset="utf-8"/>
-        <title>
-                Ping pong
-        </title>
-<link rel="stylesheet" href="css/style.css"/>
+    <meta charset="utf-8"/>
+    <title>
+        Ping pong
+    </title>
+    <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body onload="initGameLoop()">
-		<div id="scoreboard" class="container">
-			<h3>scoreboard</h3>
-			<hr>
-			<div id="scores">
-			<div>
-				BOT:
-				<span id="botScore">0</span>
-			</div>
-			<div>
-				YOU:
-				<span id="playerScore">0</span>
-			</div>
-			</div>
-                  <div class="container" onclick="toggleSound()">
-                        <img src="assets/icons/sound_on.png" alt="sound" id="sound">
-                  </div>
-			<div id="debug"></div>
-		</div>
-		<div id="field" class="container">
-			<div class="racket" id="bot">
-				BOT
-			</div>
-			<div class="ball" id="ball"></div>
-			<div class="racket" id="player">
-				YOU
-			</div>
-		</div>
+<div id="scoreboard" class="container">
+    <h3>scoreboard</h3>
+    <hr>
+    <div id="scores">
+        <div>
+            BOT:
+            <span id="botScore">0</span>
+        </div>
+        <div>
+            YOU:
+            <span id="playerScore">0</span>
+        </div>
+    </div>
+    <div class="container" onclick="toggleSound()">
+        <img src="assets/icons/sound_on.png" alt="sound" id="sound">
+    </div>
+    <div id="debug"></div>
+</div>
+<div id="field" class="container">
+    <div class="racket" id="bot">
+        BOT
+    </div>
+    <div class="ball" id="ball"></div>
+    <div class="racket" id="player">
+        YOU
+    </div>
+</div>
 
-		<div id="howto" class="container">
-			Use <kbd>&larr;</kbd><kbd>&rarr;</kbd> keys to control the racket.
-      Press <kbd>Esc</kbd> to pause the game;
-		</div>
-    <div id="paused">
-      PAUSED
+<div id="howto" class="container">
+    Use <kbd>&larr;</kbd><kbd>&rarr;</kbd> keys to control the racket.
+    Press <kbd>Esc</kbd> to pause the game;
+</div>
+<div id="paused">
+    PAUSED
+</div>
+<div id="menu">
+    <div class="menuItem" id="sp">
+        SINGLE PLAYER
     </div>
-    <div id="menu">
-        <div class="menuItem" id="sp">
-            SINGLE PLAYER
-        </div>
-        <div class="menuItem" id="mp">
-            MULTIPLAYER
-        </div>
+    <div class="menuItem" id="mp">
+        MULTIPLAYER
     </div>
-    <div id="overlay"></div>
+</div>
+<div id="overlay"></div>
 </body>
 <script src="pong.js"></script>
 </html>
