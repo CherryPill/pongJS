@@ -6,6 +6,8 @@ let paths = {
 const browserWindowWidth = window.innerWidth;
 const browserWindowHeight = window.innerHeight;
 
+const COLOR_RGB_MAX_VAL = 255;
+
 let directionVars = {
     DIR_X_LEFT: -1,
     DIR_X_RIGHT: 1,
@@ -17,6 +19,7 @@ let gameModes = {
     SINGLE_PLAYER: 0,
     MULTI_PLAYER: 1
 };
+
 let gameState = {
     gameMode: gameModes.SINGLE_PLAYER,
     paused: false,
@@ -45,16 +48,17 @@ let gameState = {
         }
     }
 };
+
 let mainMenu = {
     menuWindow: {
         htmlElement: document.getElementById("menu"),
-        width: 100,
+        width: 150,
         height: 50
     },
     startSingle: document.getElementById("sp"),
     startMulti: document.getElementById("mp"),
     showWindow: function () {
-        this.menuWindow.htmlElement.style.top = browserWindowHeight / 2 - this.menuWindow.height / 2 + "px";
+        this.menuWindow.htmlElement.style.top = browserWindowHeight / 4 - this.menuWindow.height / 2 + "px";
         this.menuWindow.htmlElement.style.left = browserWindowWidth / 2 - this.menuWindow.width / 2 + "px";
         this.menuWindow.htmlElement.style.zIndex = 2;
         this.startSingle.addEventListener("click", function () {
@@ -68,21 +72,15 @@ let mainMenu = {
         this.menuWindow.htmlElement.style.visibility = "hidden";
     }
 };
+
 let colors = {
-    availableColors: ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
-        '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
-        '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A',
-        '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
-        '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC',
-        '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
-        '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680',
-        '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
-        '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3',
-        '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF'],
-    getRandom: function () {
-        return this.availableColors[Math.ceil(Math.random() * this.availableColors.length)];
+    getRandomColor: function () {
+        return `rgb(${getRandomNum(100, COLOR_RGB_MAX_VAL)}, 
+        ${getRandomNum(100, COLOR_RGB_MAX_VAL)}, 
+        ${getRandomNum(100, COLOR_RGB_MAX_VAL)})`;
     }
 };
+
 let scores = {
     player: 0,
     bot: 0,
@@ -113,12 +111,14 @@ let controlKey = {
     WASD_A: 65,
     WASD_D: 68
 };
+
 let pressedKeys = {
     LEFT_PRESSED: false,
     RIGHT_PRESSED: false,
     WASD_A_PRESSED: false,
     WASD_D_PRESSED: false
 };
+
 let playingField = {
     viewPortWidth: 0,
     viewPortHeight: 0,
@@ -170,8 +170,8 @@ let playerInstance = {
         this.e.style.left = this.x + "px";
     },
     changeColor: function () {
-        this.e.style.backgroundColor = colors.getRandom();
-        ballInstance.e.style.backgroundColor = colors.getRandom();
+        this.e.style.backgroundColor = colors.getRandomColor();
+        ballInstance.e.style.backgroundColor = colors.getRandomColor();
     }
 };
 //y is contant
@@ -222,8 +222,8 @@ let botInstance = {
         this.e.style.left = this.x + "px";
     },
     changeColor: function () {
-        this.e.style.backgroundColor = colors.getRandom();
-        ballInstance.e.style.backgroundColor = colors.getRandom();
+        this.e.style.backgroundColor = colors.getRandomColor();
+        ballInstance.e.style.backgroundColor = colors.getRandomColor();
     }
 };
 
@@ -243,12 +243,9 @@ function getRandomDir() {
     return arr[Math.ceil(Math.random() * arr.length - 1)];
 }
 
-function getRandomNum(fr, upto) {
-    let rNum = Math.ceil(Math.random() * upto);
-    return rNum < fr ?
-        rNum += fr
-        :
-        rNum;
+function getRandomNum(min = 0, max) {
+    return Math.ceil(Math.random() *
+        (min === 0 ? max : (max - min) + min));
 }
 
 //directionY: 1 = down, -1 = up
@@ -283,9 +280,9 @@ let ballInstance = {
         this.e.style.top = this.y + "px";
     },
     changeColor: function () {
-        this.e.style.backgroundColor = colors.getRandom();
+        this.e.style.backgroundColor = colors.getRandomColor();
     }
-}
+};
 
 function movePlayer() {
     if (!gameState.paused) {
@@ -491,7 +488,6 @@ function detectCollisionPanelFieldBot(newPos) {
         return botCollisionWithBorder.noCollision;
     }
 }
-
 
 function moveBot(dir) {
     if (!gameState.paused) {
